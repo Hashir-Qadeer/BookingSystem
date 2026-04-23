@@ -1,0 +1,64 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model BookingSystem.ViewModels.AdminAppointmentsViewModel
+
+<div class="container-fluid py-4">
+    <h3 class="fw-bold mb-4">Master Appointment List</h3>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-2 mb-4">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search by service or customer..." value="@Model.SearchQuery">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="all">All Statuses</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Customer</th>
+                            <th>Provider</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var appt in Model.Appointments)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@appt.AppointmentDate.ToString("MMM dd")</strong>
+                                    <div class="small text-muted">@DateTime.Today.Add(appt.StartTime).ToString("hh:mm tt")</div>
+                                </td>
+                                <td>@appt.CustomerName</td>
+                                <td>@appt.Provider.FullName</td>
+                                <td>@appt.Service.Name</td>
+                                <td>
+                                    <span class="badge bg-@(appt.Status == "Completed" ? "success" : "warning") text-dark">
+                                        @appt.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

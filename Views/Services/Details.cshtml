@@ -1,0 +1,154 @@
+﻿@model BookingSystem.ViewModels.ServiceDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Service.Name;
+}
+
+<style>
+    .service-detail-img {
+        height: 400px;
+        object-fit: cover;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .provider-thumb {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+    }
+
+    /* Fix for the sticky sidebar width issue */
+    .sticky-wrapper {
+        position: sticky;
+        top: 2rem;
+        z-index: 1000;
+    }
+
+    .provider-selection-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+    }
+
+        .provider-selection-card:hover {
+            border-color: #667eea;
+            background-color: rgba(102,126,234,0.02);
+        }
+
+    .provider-selected {
+        border: 2px solid #667eea !important;
+        background-color: rgba(102,126,234,0.05) !important;
+    }
+</style>
+
+<section class="py-3 bg-light border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Services" asp-action="Index">Services</a></li>
+                <li class="breadcrumb-item active">@Model.Service.Name</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="@Model.Service.ImageUrl" class="card-img-top service-detail-img" alt="@Model.Service.Name">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-primary mb-2">@Model.Service.Category</span>
+                                <h2 class="fw-bold mb-2">@Model.Service.Name</h2>
+                                <div class="d-flex align-items-center gap-3 text-muted">
+                                    <span><i class="bi bi-clock text-primary"></i> <strong>@Model.Service.DurationMinutes</strong> mins</span>
+                                    <span><i class="bi bi-star-fill text-warning"></i> <strong>@Model.AverageRating.ToString("0.0")</strong> (@Model.TotalReviews reviews)</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted small">Starting at</div>
+                                <h3 class="text-primary fw-bold mb-0">$@Model.Service.Price</h3>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5 class="fw-bold mb-3">About This Service</h5>
+                        <p class="text-muted">@Model.Service.Description</p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4"><i class="bi bi-people text-primary me-2"></i>Available Providers (@Model.AvailableProviders.Count)</h4>
+                        <div class="row g-3">
+                            @foreach (var provider in Model.AvailableProviders)
+                            {
+                                <div class="col-md-6">
+                                    <div class="provider-selection-card p-3 rounded h-100"
+                                         data-provider-id="@provider.ProviderId"
+                                         data-provider-name="@provider.FullName">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <img src="@provider.ProfileImageUrl" class="rounded-circle provider-thumb" alt="@provider.FullName">
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold mb-1">@provider.FullName</h6>
+                                                <p class="text-muted small mb-1">@provider.Specialization</p>
+                                                <div class="d-flex align-items-center gap-2 mb-2">
+                                                    <span class="badge bg-warning text-dark small">
+                                                        <i class="bi bi-star-fill"></i> @provider.Rating
+                                                    </span>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-primary select-provider-btn w-100 mt-2">
+                                                    Select Provider
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-wrapper">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">Book This Service</h5>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Price</span>
+                                <span class="fw-bold fs-4 text-primary">$@Model.Service.Price</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-4">
+                                <span class="text-muted">Duration</span>
+                                <span class="fw-semibold">@Model.Service.DurationMinutes mins</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold small text-uppercase">Selected Provider</label>
+                                <div id="selectedProviderDisplay" class="alert alert-info py-2 px-3 mb-0 small">
+                                    <i class="bi bi-info-circle me-1"></i> Please select a provider
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="selectedProviderId" value="">
+
+                            <a href="#" id="bookNowBtn"
+                               data-service-id="@Model.Service.ServiceId"
+                               class="btn btn-primary btn-lg w-100 disabled shadow-sm">
+                                <i class="bi bi-calendar-check me-2"></i>Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/service-details.js"></script>
+}

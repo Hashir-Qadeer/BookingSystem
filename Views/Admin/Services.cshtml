@@ -1,0 +1,182 @@
+﻿@model BookingSystem.ViewModels.AdminServicesViewModel
+
+@{
+    ViewData["Title"] = "Manage Services";
+}
+
+<section class="py-4 bg-light border-bottom">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h3 class="fw-bold mb-2"><i class="bi bi-list-check text-primary"></i> Manage Services</h3>
+                <p class="text-muted mb-0">@Model.TotalServices services registered in system</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                    <i class="bi bi-plus-circle me-1"></i> Add New Service
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form asp-controller="Admin" asp-action="Services" method="get" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" name="search" class="form-control" placeholder="Search by name..." value="@Model.SearchQuery">
+                        </div>
+                        <div class="col-md-4">
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                <option value="Healthcare" selected="@(Model.SelectedCategory == "Healthcare")">Healthcare</option>
+                                <option value="Beauty & Salon" selected="@(Model.SelectedCategory == "Beauty & Salon")">Beauty & Salon</option>
+                                <option value="Wellness" selected="@(Model.SelectedCategory == "Wellness")">Wellness</option>
+                                <option value="Fitness" selected="@(Model.SelectedCategory == "Fitness")">Fitness</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-dark w-100">Filter</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Image</th>
+                                <th>Service Details</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var service in Model.Services)
+                            {
+                                <tr id="service-row-@service.ServiceId">
+                                    <td>
+                                        <img src="@service.ImageUrl" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">@service.Name</div>
+                                        <small class="text-muted text-truncate d-inline-block" style="max-width: 200px;">@service.Description</small>
+                                    </td>
+                                    <td><span class="badge bg-info-subtle text-info">@service.Category</span></td>
+                                    <td class="fw-bold text-primary">$@service.Price</td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                            @(service.IsActive ? "checked" : "")
+                                                   onclick="toggleStatus(@service.ServiceId)">
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteService(@service.ServiceId)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="addServiceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Create New Service</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addServiceForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Name</label>
+                        <input type="text" name="Name" class="form-control" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Price ($)</label>
+                            <input type="number" name="Price" step="0.01" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">Duration (Min)</label>
+                            <input type="number" name="DurationMinutes" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Category</label>
+                        <select name="CategoryId" class="form-select" required id="categorySelect">
+                            <option value="1">Healthcare</option>
+                            <option value="2">Beauty & Salon</option>
+                            <option value="3">Wellness</option>
+                            <option value="4">Fitness</option>
+                        </select>
+                        <input type="hidden" name="Category" id="categoryNameHidden">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description</label>
+                        <textarea name="Description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Image URL</label>
+                        <input type="text" name="ImageUrl" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitService()">Save Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleStatus(id) {
+            $.post('/Admin/ToggleServiceStatus', { id: id }, function () {
+                alert('Status Updated');
+            });
+        }
+
+        function deleteService(id) {
+            if (confirm('Permanently delete this service?')) {
+                $.post('/Admin/DeleteService', { id: id }, function () {
+                    $('#service-row-' + id).fadeOut();
+                });
+            }
+        }
+
+        function submitService() {
+            // Set the hidden text field based on selected option text before serializing
+            $('#categoryNameHidden').val($('#categorySelect option:selected').text());
+
+            var formData = $('#addServiceForm').serialize();
+
+            $.ajax({
+                url: '/Admin/AddService',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    alert('Service added successfully');
+                    location.reload();
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert('Error adding service. Check console for details.');
+                }
+            });
+        }
+    </script>
+}

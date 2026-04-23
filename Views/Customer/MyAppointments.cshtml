@@ -1,0 +1,210 @@
+﻿@model BookingSystem.ViewModels.MyAppointmentsViewModel
+
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<section class="py-4 bg-light border-bottom">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-2">My Appointments</h2>
+                <p class="text-muted mb-0">View and manage all your bookings</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <a asp-controller="Services" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Book New Service
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link @(Model.FilterStatus == "all" || string.IsNullOrEmpty(Model.FilterStatus) ? "active" : "")"
+                   asp-controller="Customer" asp-action="MyAppointments" asp-route-status="all">
+                    All Appointments
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Model.FilterStatus == "upcoming" ? "active" : "")"
+                   asp-controller="Customer" asp-action="MyAppointments" asp-route-status="upcoming">
+                    Upcoming
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Model.FilterStatus == "completed" ? "active" : "")"
+                   asp-controller="Customer" asp-action="MyAppointments" asp-route-status="completed">
+                    Completed
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(Model.FilterStatus == "cancelled" ? "active" : "")"
+                   asp-controller="Customer" asp-action="MyAppointments" asp-route-status="cancelled">
+                    Cancelled
+                </a>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        @if (Model.UpcomingAppointments.Any())
+        {
+            <h5 class="fw-bold mb-3">Upcoming Appointments</h5>
+            <div class="row g-4 mb-5">
+                @foreach (var appointment in Model.UpcomingAppointments)
+                {
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex gap-3 mb-3">
+                                    <img src="@appointment.Service.ImageUrl"
+                                         class="rounded"
+                                         style="width: 100px; height: 100px; object-fit: cover;"
+                                         alt="@appointment.Service.Name">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span class="badge bg-success">@appointment.Status</span>
+                                            <span class="text-primary fw-bold">$@appointment.Service.Price</span>
+                                        </div>
+                                        <h6 class="fw-bold mb-2">@appointment.Service.Name</h6>
+                                        <p class="text-muted small mb-1">
+                                            <i class="bi bi-person-circle"></i>
+                                            <strong>@appointment.Provider.FullName</strong> - @appointment.Provider.Specialization
+                                        </p>
+                                        <p class="text-muted small mb-1">
+                                            <i class="bi bi-calendar3"></i>
+                                            @appointment.AppointmentDate.ToString("MMMM dd, yyyy (dddd)")
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            <i class="bi bi-clock"></i>
+                                            @String.Format("{0:hh\\:mm tt}", DateTime.Today.Add(appointment.StartTime)) - @String.Format("{0:hh\\:mm tt}", DateTime.Today.Add(appointment.EndTime))
+                                            (@appointment.Service.DurationMinutes min)
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(appointment.CustomerNotes))
+                                {
+                                    <div class="alert alert-info small mb-3">
+                                        <strong>Your Notes:</strong> @appointment.CustomerNotes
+                                    </div>
+                                }
+
+                                <div class="d-flex gap-2">
+                                    <a asp-controller="Booking" asp-action="Book"
+                                       asp-route-serviceId="@appointment.ServiceId"
+                                       asp-route-providerId="@appointment.ProviderId"
+                                       class="btn btn-outline-primary flex-fill">
+                                        <i class="bi bi-arrow-repeat"></i> Reschedule
+                                    </a>
+                                    <button class="btn btn-outline-danger flex-fill"
+                                            onclick="cancelAppointment(@appointment.AppointmentId)">
+                                        <i class="bi bi-x-lg"></i> Cancel
+                                    </button>
+                                    <button class="btn btn-outline-secondary" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.PastAppointments.Any())
+        {
+            <h5 class="fw-bold mb-3">Past Appointments</h5>
+            <div class="row g-4">
+                @foreach (var appointment in Model.PastAppointments)
+                {
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100 @(appointment.Status == "Cancelled" ? "opacity-75" : "")">
+                            <div class="card-body p-4">
+                                <div class="d-flex gap-3 mb-3">
+                                    <img src="@appointment.Service.ImageUrl"
+                                         class="rounded"
+                                         style="width: 80px; height: 80px; object-fit: cover;"
+                                         alt="@appointment.Service.Name">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            @if (appointment.Status == "Completed")
+                                            {
+                                                <span class="badge bg-secondary">Completed</span>
+                                            }
+                                            else if (appointment.Status == "Cancelled")
+                                            {
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            }
+                                            <span class="text-muted">$@appointment.Service.Price</span>
+                                        </div>
+                                        <h6 class="fw-bold mb-2">@appointment.Service.Name</h6>
+                                        <p class="text-muted small mb-1">
+                                            <i class="bi bi-person-circle"></i> @appointment.Provider.FullName
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            <i class="bi bi-calendar3"></i> @appointment.AppointmentDate.ToString("MMM dd, yyyy")
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @if (appointment.Status == "Completed")
+                                {
+                                    <div class="d-flex gap-2">
+                                        <a asp-controller="Services" asp-action="Details"
+                                           asp-route-id="@appointment.ServiceId"
+                                           class="btn btn-outline-primary flex-fill">
+                                            <i class="bi bi-arrow-clockwise"></i> Book Again
+                                        </a>
+                                        <button class="btn btn-outline-warning flex-fill">
+                                            <i class="bi bi-star"></i> Leave Review
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (!Model.UpcomingAppointments.Any() && !Model.PastAppointments.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+                <h5 class="fw-bold mb-2">No Appointments Found</h5>
+                <p class="text-muted mb-4">You don't have any @Model.FilterStatus appointments yet.</p>
+                <a asp-controller="Services" asp-action="Index" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Browse Services
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function cancelAppointment(id) {
+            if (confirm('Are you sure you want to cancel this appointment? This action cannot be undone.')) {
+                $.ajax({
+                    url: '/Customer/CancelAppointment',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        showToast('Appointment cancelled successfully', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function () {
+                        showToast('Failed to cancel appointment', 'danger');
+                    }
+                });
+            }
+        }
+    </script>
+}

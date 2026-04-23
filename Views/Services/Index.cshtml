@@ -1,0 +1,253 @@
+﻿@model BookingSystem.ViewModels.ServicesViewModel
+
+@{
+    ViewData["Title"] = "Browse Services";
+}
+
+<!-- Page Header -->
+<section class="page-header bg-primary text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Browse Our Services</h1>
+                <p class="lead mb-0">Find the perfect service for your needs from our wide selection</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search & Filter Section -->
+<section class="py-4 bg-light border-bottom">
+    <div class="container">
+        <form asp-controller="Services" asp-action="Index" method="get" id="filterForm">
+            <div class="row g-3 align-items-end">
+                <!-- Search Bar -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search"></i> Search Services
+                    </label>
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Search by name or description..."
+                           value="@Model.SearchQuery"
+                           id="searchInput">
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </div>
+
+                <!-- Category Filter -->
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-tag"></i> Category
+                    </label>
+                    <select name="category" class="form-select" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <option value="@cat" selected="@(Model.SelectedCategory == cat)">@cat</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-sort-down"></i> Sort By
+                    </label>
+                    <select name="sortBy" class="form-select" id="sortFilter">
+                        <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+                        <option value="price-low" selected="@(Model.SortBy == "price-low")">Price: Low to High</option>
+                        <option value="price-high" selected="@(Model.SortBy == "price-high")">Price: High to Low</option>
+                        <option value="duration" selected="@(Model.SortBy == "duration")">Duration</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-lg-3 col-md-6">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Price Range Filter -->
+            <div class="row mt-3">
+                <div class="col-lg-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-currency-dollar"></i> Price Range:
+                        <span id="priceRangeDisplay">$@Model.MinPrice - $@Model.MaxPrice</span>
+                    </label>
+                    <div class="d-flex gap-3 align-items-center">
+                        <input type="range"
+                               name="minPrice"
+                               class="form-range"
+                               min="0"
+                               max="200"
+                               step="5"
+                               value="@Model.MinPrice"
+                               id="minPriceRange">
+                        <input type="range"
+                               name="maxPrice"
+                               class="form-range"
+                               min="0"
+                               max="200"
+                               step="5"
+                               value="@Model.MaxPrice"
+                               id="maxPriceRange">
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-secondary" id="resetFilters">
+                        <i class="bi bi-arrow-clockwise"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Results Section -->
+<section class="py-5">
+    <div class="container">
+        <!-- Results Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1">
+                    @if (!string.IsNullOrEmpty(Model.SelectedCategory))
+                    {
+                        <span>@Model.SelectedCategory Services</span>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.SearchQuery))
+                    {
+                        <span>Search Results for "@Model.SearchQuery"</span>
+                    }
+                    else
+                    {
+                        <span>All Services</span>
+                    }
+                </h4>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-check-circle"></i> @Model.TotalServices services found
+                </p>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary active" id="gridView">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="listView">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+            </div>
+        </div>
+
+        @if (Model.Services.Any())
+        {
+            <!-- Services Grid -->
+            <div class="row g-4" id="servicesContainer">
+                @foreach (var service in Model.Services)
+                {
+                    <div class="col-lg-4 col-md-6 service-item">
+                        <div class="card service-card h-100 border-0 shadow-sm">
+                            <div class="position-relative">
+                                <img src="@service.ImageUrl" class="card-img-top service-img" alt="@service.Name">
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-3">
+                                    @service.Category
+                                </span>
+                                <div class="service-overlay">
+                                    <a asp-controller="Services" asp-action="Details" asp-route-id="@service.ServiceId"
+                                       class="btn btn-light">
+                                        View Details <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0">@service.Name</h5>
+                                    <span class="text-primary fw-bold fs-5">$@service.Price</span>
+                                </div>
+                                <p class="card-text text-muted mb-3">@service.Description</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">
+                                        <i class="bi bi-clock"></i> @service.DurationMinutes min
+                                    </span>
+                                    <a asp-controller="Booking" asp-action="Book" asp-route-serviceId="@service.ServiceId"
+                                       class="btn btn-primary btn-sm">
+                                        Book Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- No Results -->
+            <div class="text-center py-5">
+                <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
+                <h4 class="fw-bold mb-2">No Services Found</h4>
+                <p class="text-muted mb-4">
+                    We couldn't find any services matching your criteria. Try adjusting your filters.
+                </p>
+                <button type="button" class="btn btn-primary" id="clearFiltersBtn">
+                    Clear All Filters
+                </button>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Popular Categories -->
+@if (Model.Services.Any())
+{
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold mb-2">Browse by Category</h3>
+                <p class="text-muted">Quick access to service categories</p>
+            </div>
+            <div class="row g-3">
+                @foreach (var category in Model.Categories)
+                {
+                    var categoryCount = Model.Services.Count(s => s.Category == category);
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-controller="Services" asp-action="Index" asp-route-category="@category"
+                           class="category-link text-decoration-none">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center py-4">
+                                    @switch (category)
+                                    {
+                                        case "Healthcare":
+                                            <i class="bi bi-heart-pulse fs-1 text-danger mb-2"></i>
+                                            break;
+                                        case "Beauty & Salon":
+                                            <i class="bi bi-scissors fs-1 text-pink mb-2"></i>
+                                            break;
+                                        case "Wellness":
+                                            <i class="bi bi-flower1 fs-1 text-success mb-2"></i>
+                                            break;
+                                        case "Fitness":
+                                            <i class="bi bi-activity fs-1 text-primary mb-2"></i>
+                                            break;
+                                        default:
+                                            <i class="bi bi-star fs-1 text-warning mb-2"></i>
+                                            break;
+                                    }
+                                    <h6 class="fw-bold mb-1">@category</h6>
+                                    <p class="text-muted small mb-0">@categoryCount services</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script src="~/js/services.js"></script>
+}

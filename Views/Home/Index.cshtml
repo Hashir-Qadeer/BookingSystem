@@ -1,0 +1,263 @@
+﻿@model BookingSystem.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4 text-white">
+                    Book Your Perfect Appointment
+                </h1>
+                <p class="lead text-white mb-4">
+                    Connect with top service providers and schedule appointments instantly.
+                    Easy, fast, and hassle-free booking experience.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Services" asp-action="Index" class="btn btn-light btn-lg px-4">
+                        <i class="bi bi-search"></i> Browse Services
+                    </a>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-outline-light btn-lg px-4">
+                        Get Started
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="row mt-5 g-4">
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <h3 class="fw-bold text-white mb-0">@Model.TotalServices+</h3>
+                            <p class="text-white-50 mb-0">Services</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <h3 class="fw-bold text-white mb-0">@Model.TotalProviders+</h3>
+                            <p class="text-white-50 mb-0">Providers</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-card">
+                            <h3 class="fw-bold text-white mb-0">@Model.TotalBookings+</h3>
+                            <p class="text-white-50 mb-0">Bookings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600"
+                     alt="Hero Image"
+                     class="img-fluid rounded-4 shadow-lg">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">How It Works</h2>
+            <p class="text-muted">Book your appointment in just 3 simple steps</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-icon mb-3">
+                        <i class="bi bi-search fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">1. Choose Service</h4>
+                    <p class="text-muted">
+                        Browse through our wide range of services and select the one that fits your needs.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-icon mb-3">
+                        <i class="bi bi-calendar-check fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">2. Pick Time Slot</h4>
+                    <p class="text-muted">
+                        Select your preferred provider and choose from available time slots that work for you.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-icon mb-3">
+                        <i class="bi bi-check-circle fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">3. Confirm Booking</h4>
+                    <p class="text-muted">
+                        Complete your booking and receive instant confirmation with appointment details.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Services Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-2">Featured Services</h2>
+                <p class="text-muted">Discover our most popular services</p>
+            </div>
+            <a asp-controller="Services" asp-action="Index" class="btn btn-outline-primary">
+                View All <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var service in Model.FeaturedServices)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card service-card h-100 border-0 shadow-sm">
+                        <img src="@service.ImageUrl" class="card-img-top service-img" alt="@service.Name">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">@service.Category</span>
+                                <span class="text-primary fw-bold fs-5">$@service.Price</span>
+                            </div>
+                            <h5 class="card-title fw-bold">@service.Name</h5>
+                            <p class="card-text text-muted">@service.Description</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="text-muted">
+                                    <i class="bi bi-clock"></i> @service.DurationMinutes min
+                                </span>
+                                <a asp-controller="Services" asp-action="Details" asp-route-id="@service.ServiceId"
+                                   class="btn btn-primary">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Top Providers Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Our Top Providers</h2>
+            <p class="text-muted">Meet our highly rated and experienced professionals</p>
+        </div>
+
+        <div class="row g-4">
+            @foreach (var provider in Model.TopProviders)
+            {
+                <div class="col-lg-3 col-md-6">
+                    <div class="card provider-card text-center h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <img src="@provider.ProfileImageUrl"
+                                 class="rounded-circle mb-3 provider-img"
+                                 alt="@provider.FullName">
+                            <h5 class="fw-bold mb-1">@provider.FullName</h5>
+                            <p class="text-muted mb-2">@provider.Specialization</p>
+                            <div class="mb-3">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <span class="fw-bold">@provider.Rating</span>
+                                <span class="text-muted">(@provider.TotalReviews reviews)</span>
+                            </div>
+                            <div class="mb-3 text-muted small">
+                                <i class="bi bi-briefcase"></i> @provider.YearsOfExperience years exp.
+                            </div>
+                            <a asp-controller="Provider" asp-action="Details" asp-route-id="@provider.ProviderId"
+                               class="btn btn-outline-primary w-100">
+                                View Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Browse by Category</h2>
+            <p class="text-muted">Find services that match your needs</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <a asp-controller="Services" asp-action="Index" asp-route-category="Healthcare"
+                   class="category-card text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-heart-pulse fs-1 text-danger mb-3"></i>
+                            <h5 class="fw-bold">Healthcare</h5>
+                            <p class="text-muted mb-0">Medical consultations & checkups</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a asp-controller="Services" asp-action="Index" asp-route-category="Beauty"
+                   class="category-card text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-scissors fs-1 text-pink mb-3"></i>
+                            <h5 class="fw-bold">Beauty & Salon</h5>
+                            <p class="text-muted mb-0">Hair, makeup & beauty services</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a asp-controller="Services" asp-action="Index" asp-route-category="Wellness"
+                   class="category-card text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-flower1 fs-1 text-success mb-3"></i>
+                            <h5 class="fw-bold">Wellness</h5>
+                            <p class="text-muted mb-0">Massage & relaxation therapy</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <a asp-controller="Services" asp-action="Index" asp-route-category="Fitness"
+                   class="category-card text-decoration-none">
+                    <div class="card border-0 shadow-sm h-100 text-center">
+                        <div class="card-body py-5">
+                            <i class="bi bi-activity fs-1 text-primary mb-3"></i>
+                            <h5 class="fw-bold">Fitness</h5>
+                            <p class="text-muted mb-0">Personal training & yoga classes</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 cta-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center text-white">
+                <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+                <p class="lead mb-4">
+                    Join thousands of satisfied customers who trust BookingSystem for their appointments
+                </p>
+                <a asp-controller="Account" asp-action="Register" class="btn btn-light btn-lg px-5">
+                    Create Free Account
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,157 @@
+﻿@model BookingSystem.ViewModels.BookingViewModel
+
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="booking-progress mb-5">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <div class="progress-step completed">
+                        <div class="step-icon"><i class="bi bi-check-circle-fill"></i></div>
+                        <p class="mb-0 mt-2 fw-semibold">Select Service</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress-step completed">
+                        <div class="step-icon"><i class="bi bi-check-circle-fill"></i></div>
+                        <p class="mb-0 mt-2 fw-semibold">Choose Provider</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress-step active">
+                        <div class="step-icon"><i class="bi bi-calendar-check"></i></div>
+                        <p class="mb-0 mt-2 fw-semibold">Select Time</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress-step">
+                        <div class="step-icon"><i class="bi bi-check-square"></i></div>
+                        <p class="mb-0 mt-2 fw-semibold">Confirm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold mb-4"><i class="bi bi-info-circle text-primary"></i> Booking Summary</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex gap-3">
+                                    <img src="@Model.Service.ImageUrl" class="rounded booking-service-img" alt="@Model.Service.Name">
+                                    <div>
+                                        <span class="badge bg-primary mb-2">@Model.Service.Category</span>
+                                        <h6 class="fw-bold mb-1">@Model.Service.Name</h6>
+                                        <p class="text-muted small mb-0"><i class="bi bi-clock"></i> @Model.Service.DurationMinutes min</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex gap-3">
+                                    <img src="@Model.Provider.ProfileImageUrl" class="rounded-circle booking-provider-img" alt="@Model.Provider.FullName">
+                                    <div>
+                                        <h6 class="fw-bold mb-1">@Model.Provider.FullName</h6>
+                                        <p class="text-muted small mb-1">@Model.Provider.Specialization</p>
+                                        <p class="mb-0 text-warning"><i class="bi bi-star-fill"></i> @Model.Provider.Rating</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event text-primary"></i> Select Date</h5>
+                        <div class="date-picker-container">
+                            <div class="row g-2">
+                                @for (int i = 0; i < 7; i++)
+                                {
+                                    var currentDate = DateTime.Today.AddDays(i);
+                                    var isSelected = currentDate.Date == Model.SelectedDate.Date;
+                                    <div class="col">
+                                        <div class="date-card @(isSelected ? "selected" : "")" data-date="@currentDate.ToString("yyyy-MM-dd")">
+                                            <div class="date-day">@currentDate.ToString("ddd")</div>
+                                            <div class="date-number">@currentDate.Day</div>
+                                            <div class="date-month">@currentDate.ToString("MMM")</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-clock text-primary"></i> Available Time Slots</h5>
+                            <span id="selectedDateDisplay" class="badge bg-primary">@Model.SelectedDate.ToString("MMM dd, yyyy")</span>
+                        </div>
+
+                        <div id="timeSlotsContainer">
+                            <div class="row g-2">
+                                @foreach (var slot in Model.AvailableSlots)
+                                {
+                                    <div class="col-md-3 col-6">
+                                        <button type="button" class="time-slot-btn @(!slot.IsAvailable ? "disabled" : "")"
+                                                data-start-time="@slot.StartTime.ToString(@"hh\:mm")" @(!slot.IsAvailable ? "disabled" : "")>
+                                            @slot.StartTime.ToString(@"hh\:mm")
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 100px;">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">Booking Details</h5>
+                            <form asp-controller="Booking" asp-action="ConfirmBooking" method="post" id="bookingForm">
+                                <input type="hidden" name="serviceId" value="@Model.Service.ServiceId">
+                                <input type="hidden" name="providerId" value="@Model.Provider.ProviderId">
+                                <input type="hidden" name="startTime" id="selectedStartTime" value="">
+                                <input type="hidden" name="selectedDate" id="selectedDateInput" value="@Model.SelectedDate.ToString("yyyy-MM-dd")">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Selected Time</label>
+                                    <div id="selectedTimeDisplay" class="alert alert-warning mb-0 small">
+                                        <i class="bi bi-exclamation-triangle"></i> Please select a time slot
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Notes (Optional)</label>
+                                    <textarea class="form-control" name="notes" rows="3" placeholder="Special requests..."></textarea>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Price</span>
+                                    <span class="fw-bold text-primary">$@Model.Service.Price</span>
+                                </div>
+                                <hr>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-2" id="confirmBookingBtn" disabled>
+                                    Confirm Booking
+                                </button>
+                                <a asp-controller="Services" asp-action="Details" asp-route-id="@Model.Service.ServiceId" class="btn btn-outline-secondary w-100">Go Back</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/booking.js"></script>
+}

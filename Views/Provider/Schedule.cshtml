@@ -1,0 +1,59 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model BookingSystem.ViewModels.ProviderScheduleViewModel
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 text-center">
+                <h5 class="fw-bold mb-3">Calendar</h5>
+                <input type="date" id="scheduleDatePicker" class="form-control mb-3" value="@Model.SelectedDate.ToString("yyyy-MM-dd")">
+                <p class="text-muted small">Select a date to view or manage your available slots.</p>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm p-4">
+                <h5 class="fw-bold mb-4">Availability for @Model.SelectedDate.ToString("MMMM dd, yyyy")</h5>
+                <div id="slotsLoader" class="row g-2">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadSlots($('#scheduleDatePicker').val());
+
+            $('#scheduleDatePicker').on('change', function () {
+                loadSlots($(this).val());
+            });
+        });
+
+        function loadSlots(date) {
+            const providerId = "@Model.Provider.ProviderId";
+            $.get('/Booking/GetTimeSlots', { providerId: providerId, date: date }, function (data) {
+                let html = '<div class="row g-2">';
+                data.forEach(slot => {
+                    const color = slot.isBooked ? 'danger' : 'success';
+                    html += `
+                                <div class="col-md-3">
+                                    <div class="p-2 border rounded text-center bg-${color}-subtle border-${color}">
+                                        <div class="small fw-bold">${slot.startTime.substring(0, 5)}</div>
+                                        <div class="x-small text-muted">${slot.isBooked ? 'BOOKED' : 'OPEN'}</div>
+                                    </div>
+                                </div>`;
+                });
+                html += '</div>';
+                $('#slotsLoader').html(html);
+            });
+        }
+    </script>
+}

@@ -1,0 +1,281 @@
+﻿@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<section class="hero-section-small bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">Get in Touch</h1>
+        <p class="lead">We'd love to hear from you. Send us a message!</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-5">
+                        <h3 class="fw-bold mb-4">Send us a Message</h3>
+                        <form id="contactForm" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-person text-primary"></i> First Name
+                                    </label>
+                                    <input type="text" class="form-control" placeholder="John" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-person text-primary"></i> Last Name
+                                    </label>
+                                    <input type="text" class="form-control" placeholder="Doe" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-envelope text-primary"></i> Email Address
+                                </label>
+                                <input type="email" class="form-control" placeholder="john.doe@example.com" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-telephone text-primary"></i> Phone Number
+                                </label>
+                                <input type="tel" class="form-control" placeholder="+1 (555) 123-4567">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-tag text-primary"></i> Subject
+                                </label>
+                                <select class="form-select" required>
+                                    <option value="">Select a subject...</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="booking">Booking Issue</option>
+                                    <option value="provider">Become a Provider</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="feedback">Feedback</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-chat-left-text text-primary"></i> Message
+                                </label>
+                                <textarea class="form-control" rows="6" placeholder="Tell us how we can help you..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-send"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-lg-5">
+                <div class="mb-4">
+                    <h3 class="fw-bold mb-4">Contact Information</h3>
+                    <p class="text-muted mb-4">
+                        Have a question or need assistance? We're here to help!
+                        Reach out to us through any of the following channels.
+                    </p>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="contact-item mb-4">
+                            <div class="d-flex gap-3">
+                                <div class="contact-icon">
+                                    <i class="bi bi-geo-alt-fill text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Address</h6>
+                                    <p class="text-muted mb-0">
+                                        123 Business Street<br>
+                                        Suite 100<br>
+                                        New York, NY 10001
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item mb-4">
+                            <div class="d-flex gap-3">
+                                <div class="contact-icon">
+                                    <i class="bi bi-telephone-fill text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Phone</h6>
+                                    <p class="text-muted mb-0">
+                                        <a href="tel:+15551234567" class="text-decoration-none text-muted">
+                                            +1 (555) 123-4567
+                                        </a><br>
+                                        <small>Mon-Fri: 9:00 AM - 6:00 PM EST</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item mb-4">
+                            <div class="d-flex gap-3">
+                                <div class="contact-icon">
+                                    <i class="bi bi-envelope-fill text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Email</h6>
+                                    <p class="text-muted mb-0">
+                                        <a href="mailto:info@bookingsystem.com" class="text-decoration-none text-muted">
+                                            info@bookingsystem.com
+                                        </a><br>
+                                        <a href="mailto:support@bookingsystem.com" class="text-decoration-none text-muted">
+                                            support@bookingsystem.com
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="d-flex gap-3">
+                                <div class="contact-icon">
+                                    <i class="bi bi-clock-fill text-primary fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Business Hours</h6>
+                                    <p class="text-muted mb-0">
+                                        Monday - Friday: 9:00 AM - 6:00 PM<br>
+                                        Saturday: 10:00 AM - 4:00 PM<br>
+                                        Sunday: Closed
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm bg-primary text-white">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Follow Us</h6>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="btn btn-light btn-sm">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="#" class="btn btn-light btn-sm">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            <a href="#" class="btn btn-light btn-sm">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            <a href="#" class="btn btn-light btn-sm">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                            <a href="#" class="btn btn-light btn-sm">
+                                <i class="bi bi-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="fw-bold text-center mb-4">Visit Our Office</h3>
+        <div class="ratio ratio-16x9 rounded-4 shadow-lg overflow-hidden">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.119763973046!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-3">Frequently Asked Questions</h3>
+            <p class="text-muted">Quick answers to common questions</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How do I book an appointment?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Simply browse our services, select your preferred provider, choose a time slot,
+                                and confirm your booking. You'll receive instant confirmation via email.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Can I cancel or reschedule my appointment?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! You can cancel or reschedule up to 24 hours before your appointment
+                                free of charge through your dashboard.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-0 shadow-sm mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                How do I become a service provider?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Contact us through this form or email us at providers@bookingsystem.com.
+                                We'll guide you through the registration process.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $('#contactForm').on('submit', function (e) {
+            e.preventDefault();
+
+            if (this.checkValidity()) {
+                showLoading($(this).find('button[type="submit"]'));
+
+                // Simulate form submission
+                setTimeout(() => {
+                    showToast('Message sent successfully! We\'ll get back to you soon.', 'success');
+                    this.reset();
+                    hideLoading($(this).find('button[type="submit"]'));
+                }, 1500);
+            }
+
+            $(this).addClass('was-validated');
+        });
+    </script>
+}

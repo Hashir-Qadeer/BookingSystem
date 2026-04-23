@@ -1,0 +1,268 @@
+﻿@model BookingSystem.ViewModels.CustomerDashboardViewModels
+
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<section class="py-4 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="fw-bold mb-2">Welcome back, @Model.Customer.FirstName!</h2>
+                <p class="mb-0">Manage your appointments and bookings</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a asp-controller="Services" asp-action="Index" class="btn btn-light">
+                    <i class="bi bi-plus-circle"></i> Book New Service
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dashboard card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Total Bookings</p>
+                                <h3 class="fw-bold mb-0">@Model.TotalBookings</h3>
+                            </div>
+                            <div class="stat-icon bg-primary-subtle">
+                                <i class="bi bi-calendar-check text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dashboard card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Upcoming</p>
+                                <h3 class="fw-bold mb-0">@Model.UpcomingAppointments.Count</h3>
+                            </div>
+                            <div class="stat-icon bg-warning-subtle">
+                                <i class="bi bi-clock-history text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dashboard card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Completed</p>
+                                <h3 class="fw-bold mb-0">@Model.CompletedBookings</h3>
+                            </div>
+                            <div class="stat-icon bg-success-subtle">
+                                <i class="bi bi-check-circle text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card-dashboard card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1">Cancelled</p>
+                                <h3 class="fw-bold mb-0">@Model.CancelledBookings</h3>
+                            </div>
+                            <div class="stat-icon bg-danger-subtle">
+                                <i class="bi bi-x-circle text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Upcoming Appointments -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-calendar-event text-primary"></i>
+                                Upcoming Appointments
+                            </h5>
+                            <a asp-controller="Customer" asp-action="MyAppointments" class="text-primary text-decoration-none">
+                                View All <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        @if (Model.UpcomingAppointments.Any())
+                        {
+                            foreach (var appointment in Model.UpcomingAppointments)
+                            {
+                                <div class="appointment-card mb-3 p-3 border rounded">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex gap-3">
+                                                <img src="@appointment.Service.ImageUrl" class="rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="@appointment.Service.Name">
+                                                <div>
+                                                    <span class="badge bg-success mb-1">@appointment.Status</span>
+                                                    <h6 class="fw-bold mb-1">@appointment.Service.Name</h6>
+                                                    <p class="text-muted small mb-1">
+                                                        <i class="bi bi-person"></i> @appointment.Provider.FullName
+                                                    </p>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="bi bi-calendar3"></i> @appointment.AppointmentDate.ToString("MMM dd, yyyy") at @String.Format("{0:hh\\:mm tt}", DateTime.Today.Add(appointment.StartTime))
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="rescheduleAppointment(@appointment.AppointmentId)">
+                                                    <i class="bi bi-arrow-repeat"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="cancelAppointment(@appointment.AppointmentId)">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+                                <p class="text-muted mb-3">No upcoming appointments</p>
+                                <a asp-controller="Services" asp-action="Index" class="btn btn-primary">
+                                    Book a Service
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Recent Appointments -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="bi bi-clock-history text-primary"></i>
+                            Recent Appointments
+                        </h5>
+
+                        @if (Model.PastAppointments.Any())
+                        {
+                            foreach (var appointment in Model.PastAppointments)
+                            {
+                                <div class="appointment-card mb-3 p-3 border rounded bg-light">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex gap-3">
+                                            <img src="@appointment.Service.ImageUrl" class="rounded" style="width: 60px; height: 60px; object-fit: cover;" alt="@appointment.Service.Name">
+                                            <div>
+                                                <h6 class="fw-bold mb-1">@appointment.Service.Name</h6>
+                                                <p class="text-muted small mb-1">
+                                                    <i class="bi bi-person"></i> @appointment.Provider.FullName
+                                                </p>
+                                                <p class="text-muted small mb-0">
+                                                    <i class="bi bi-calendar3"></i> @appointment.AppointmentDate.ToString("MMM dd, yyyy")
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-secondary">@appointment.Status</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center mb-0">No past appointments</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Profile Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4 text-center">
+                        <img src="@Model.Customer.ProfileImageUrl" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;" alt="@Model.Customer.FullName">
+                        <h5 class="fw-bold mb-1">@Model.Customer.FullName</h5>
+                        <p class="text-muted mb-3">@Model.Customer.Email</p>
+                        <a asp-controller="Customer" asp-action="Profile" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Quick Actions</h6>
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Services" asp-action="Index" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Book New Service
+                            </a>
+                            <a asp-controller="Customer" asp-action="MyAppointments" class="btn btn-outline-primary">
+                                <i class="bi bi-calendar-event"></i> View All Appointments
+                            </a>
+                            <a asp-controller="Services" asp-action="Index" class="btn btn-outline-primary">
+                                <i class="bi bi-heart"></i> Favorite Services
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        function cancelAppointment(id) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                $.post('/Customer/CancelAppointment', { id: id }, function () {
+                    location.reload();
+                });
+            }
+        }
+
+        function rescheduleAppointment(id) {
+            window.location.href = '/Customer/RescheduleAppointment?id=' + id;
+        }
+
+        // Add animation CSS
+        const style = document.createElement('style');
+        style.textContent = \`
+                    .stat-card-dashboard {
+                        transition: all 0.3s ease;
+                    }
+                    .stat-card-dashboard:hover {
+                        transform: translateY(-5px);
+                    }
+                    .stat-icon {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5rem;
+                    }
+                    .appointment-card {
+                        transition: all 0.3s ease;
+                    }
+                    .appointment-card:hover {
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                    }
+                \`;
+                document.head.appendChild(style);
+    </script>
+}

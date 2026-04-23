@@ -1,0 +1,85 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model BookingSystem.ViewModels.ProviderAppointmentsViewModel
+
+@{
+    ViewData["Title"] = "Professional Appointments";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">All Appointments</h2>
+        <div class="btn-group">
+            <a href="?status=all" class="btn btn-outline-primary @(Model.FilterStatus == "all" ? "active" : "")">All</a>
+            <a href="?status=confirmed" class="btn btn-outline-primary @(Model.FilterStatus == "confirmed" ? "active" : "")">Confirmed</a>
+            <a href="?status=completed" class="btn btn-outline-primary @(Model.FilterStatus == "completed" ? "active" : "")">Completed</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    // Combine the filtered lists from the ViewModel
+                    var displayList = Model.TodayAppointments
+                    .Concat(Model.UpcomingAppointments)
+                    .Concat(Model.PastAppointments)
+                    .OrderByDescending(a => a.AppointmentDate)
+                    .ThenBy(a => a.StartTime);
+                }
+
+                @foreach (var appt in displayList)
+                {
+                    <tr>
+                        <td>
+                            <div class="fw-bold">@appt.AppointmentDate.ToString("MMM dd, yyyy")</div>
+                            <small class="text-muted">@DateTime.Today.Add(appt.StartTime).ToString("hh:mm tt")</small>
+                        </td>
+                        <td>@appt.CustomerName</td>
+                        <td>@appt.Service.Name</td>
+                        <td>
+                            <span class="badge rounded-pill bg-@(appt.Status == "Confirmed" ? "primary" : appt.Status == "Completed" ? "success" : "danger")-subtle text-@(appt.Status == "Confirmed" ? "primary" : appt.Status == "Completed" ? "success" : "danger")">
+                                @appt.Status
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            @if (appt.Status == "Confirmed")
+                            {
+                                <button onclick="updateStatus(@appt.AppointmentId, 'Completed')" class="btn btn-sm btn-success" title="Mark Completed">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                <button onclick="updateStatus(@appt.AppointmentId, 'Cancelled')" class="btn btn-sm btn-danger" title="Cancel">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateStatus(id, status) {
+            if (confirm(`Move this appointment to ${status}?`)) {
+                $.post('/Provider/UpdateAppointmentStatus', { id: id, status: status }, function () {
+                    location.reload();
+                });
+            }
+        }
+    </script>
+}

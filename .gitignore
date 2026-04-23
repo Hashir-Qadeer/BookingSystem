@@ -1,0 +1,10 @@
+﻿# Build folders
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+
+# Environment-specific settings
+appsettings.Development.json

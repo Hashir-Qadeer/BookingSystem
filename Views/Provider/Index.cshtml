@@ -1,0 +1,188 @@
+﻿@model BookingSystem.ViewModels.ProvidersListViewModel
+
+@{
+    ViewData["Title"] = "Browse Providers";
+}
+
+<section class="page-header bg-primary text-white py-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Our Service Providers</h1>
+        <p class="lead mb-0">Find and book with top-rated professionals</p>
+    </div>
+</section>
+
+<section class="py-4 bg-light border-bottom">
+    <div class="container">
+        <form asp-controller="Provider" asp-action="Index" method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-search"></i> Search Providers
+                    </label>
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Search by name or specialization..."
+                           value="@Model.SearchQuery">
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-funnel"></i> Specialization
+                    </label>
+                    <select name="category" class="form-select">
+                        <option value="">All Specializations</option>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <option value="@cat" selected="@(Model.SelectedCategory == cat)">@cat</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-sort-down"></i> Sort By
+                    </label>
+                    <select name="sortBy" class="form-select">
+                        <option value="rating" selected="@(Model.SortBy == "rating")">Highest Rated</option>
+                        <option value="experience" selected="@(Model.SortBy == "experience")">Most Experienced</option>
+                        <option value="reviews" selected="@(Model.SortBy == "reviews")">Most Reviews</option>
+                        <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">
+                @if (!string.IsNullOrEmpty(Model.SearchQuery))
+                {
+                    <span>Search Results for "@Model.SearchQuery"</span>
+                }
+                else
+                {
+                    <span>All Providers</span>
+                }
+            </h4>
+            <p class="text-muted mb-0">
+                <i class="bi bi-check-circle"></i> @Model.TotalProviders providers found
+            </p>
+        </div>
+
+        @if (Model.Providers.Any())
+        {
+            <div class="row g-4">
+                @foreach (var provider in Model.Providers)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card provider-card h-100 border-0 shadow-sm">
+                            <div class="card-body p-4 text-center">
+                                <img src="@provider.ProfileImageUrl"
+                                     class="rounded-circle mb-3 provider-profile-img"
+                                     alt="@provider.FullName">
+
+                                <h5 class="fw-bold mb-1">@provider.FullName</h5>
+                                <p class="text-primary mb-2">@provider.Specialization</p>
+
+                                <div class="mb-3">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <span class="fw-bold">@provider.Rating</span>
+                                    <span class="text-muted">(@provider.TotalReviews reviews)</span>
+                                </div>
+
+                                <div class="provider-stats mb-3">
+                                    <div class="row g-2 text-center">
+                                        <div class="col-6">
+                                            <div class="stat-box bg-light rounded p-2">
+                                                <i class="bi bi-briefcase text-primary"></i>
+                                                <p class="small mb-0 fw-semibold">@provider.YearsOfExperience Years</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-box bg-light rounded p-2">
+                                                <i class="bi bi-check-circle text-success"></i>
+                                                <p class="small mb-0 fw-semibold">
+                                                    @(provider.IsAvailable ? "Available" : "Busy")
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted small mb-3">@provider.Bio</p>
+
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="Provider"
+                                       asp-action="Details"
+                                       asp-route-id="@provider.ProviderId"
+                                       class="btn btn-primary">
+                                        <i class="bi bi-person"></i> View Profile
+                                    </a>
+                                    <a asp-controller="Booking"
+                                       asp-action="Book"
+                                       asp-route-providerId="@provider.ProviderId"
+                                       class="btn btn-outline-primary">
+                                        <i class="bi bi-calendar-check"></i> Book Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
+                <h4 class="fw-bold mb-2">No Providers Found</h4>
+                <p class="text-muted mb-4">Try adjusting your search criteria</p>
+                <a asp-controller="Provider" asp-action="Index" class="btn btn-primary">
+                    View All Providers
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $('.form-select').on('change', function () {
+            $(this).closest('form').submit();
+        });
+
+        // Add CSS
+        const style = document.createElement('style');
+        style.textContent = `
+                    .provider-profile-img {
+                        width: 120px;
+                        height: 120px;
+                        object-fit: cover;
+                        border: 4px solid #f8f9fa;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                    }
+                    .provider-card {
+                        transition: all 0.3s ease;
+                    }
+                    .provider-card:hover {
+                        transform: translateY(-10px);
+                        box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+                    }
+                `;
+        document.head.appendChild(style);
+    </script>
+}@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}

@@ -1,0 +1,152 @@
+﻿@model BookingSystem.ViewModels.BookingConfirmationViewModel
+
+@{
+    ViewData["Title"] = "Booking Confirmed";
+}
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Success Animation -->
+                <div class="text-center mb-4">
+                    <div class="success-checkmark">
+                        <div class="check-icon">
+                            <span class="icon-line line-tip"></span>
+                            <span class="icon-line line-long"></span>
+                            <div class="icon-circle"></div>
+                            <div class="icon-fix"></div>
+                        </div>
+                    </div>
+                    <h2 class="fw-bold mt-4 mb-2">Booking Confirmed!</h2>
+                    <p class="text-muted">Your appointment has been successfully scheduled</p>
+                </div>
+
+                <!-- Confirmation Card -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h5 class="fw-bold mb-2">Confirmation Number</h5>
+                            <h3 class="text-primary fw-bold">@Model.ConfirmationNumber</h3>
+                            <p class="text-muted small">Please save this number for your records</p>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold mb-3">Appointment Details</h6>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <i class="bi bi-calendar3 text-primary"></i>
+                                    <div>
+                                        <p class="text-muted small mb-0">Date</p>
+                                        <p class="fw-semibold mb-0">@Model.Appointment.AppointmentDate.ToString("MMMM dd, yyyy")</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <i class="bi bi-clock text-primary"></i>
+                                    <div>
+                                        <p class="text-muted small mb-0">Time</p>
+                                        <p class="fw-semibold mb-0">
+                                            @DateTime.Today.Add(Model.Appointment.StartTime).ToString("hh:mm tt")
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-provider-info p-3 bg-light rounded mb-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <img src="@Model.Service.ImageUrl" class="rounded" style="width: 60px; height: 60px; object-fit: cover;" alt="@Model.Service.Name">
+                                        <div>
+                                            <p class="text-muted small mb-0">Service</p>
+                                            <h6 class="fw-bold mb-0">@Model.Service.Name</h6>
+                                            <p class="text-muted small mb-0">@Model.Service.DurationMinutes min · $@Model.Service.Price</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <img src="@Model.Provider.ProfileImageUrl" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;" alt="@Model.Provider.FullName">
+                                        <div>
+                                            <p class="text-muted small mb-0">Provider</p>
+                                            <h6 class="fw-bold mb-0">@Model.Provider.FullName</h6>
+                                            <p class="text-muted small mb-0">@Model.Provider.Specialization</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Appointment.CustomerNotes))
+                        {
+                            <div class="alert alert-info">
+                                <strong>Your Notes:</strong> @Model.Appointment.CustomerNotes
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <a asp-controller="Customer" asp-action="MyAppointments" class="btn btn-primary w-100">
+                            <i class="bi bi-calendar-check"></i> View My Appointments
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-controller="Services" asp-action="Index" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-search"></i> Book Another Service
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Additional Info -->
+                <div class="card border-0 bg-light">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-info-circle text-primary"></i>
+                            What's Next?
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                You'll receive a confirmation email shortly
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                We'll send you a reminder 24 hours before your appointment
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                You can reschedule or cancel anytime from your dashboard
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                Contact us if you have any questions or concerns
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Trigger confetti animation
+        if (typeof confetti !== 'undefined') {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+}
