@@ -12,9 +12,11 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-     ?? builder.Configuration.GetConnectionString("DefaultConnection")
-     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+     var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+var connectionString = ConvertDatabaseUrl(rawConnectionString);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
      options.UseNpgsql(connectionString));
@@ -89,6 +91,21 @@ namespace BookingSystem
             app.MapRazorPages();
 
             await app.RunAsync();
+        }
+        private static string ConvertDatabaseUrl(string url)
+        {
+            if (!url.StartsWith("postgresql://") && !url.StartsWith("postgres://"))
+                return url;
+
+            var uri = new Uri(url);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+
+            return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
         }
     }
 }
