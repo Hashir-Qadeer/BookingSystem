@@ -48,8 +48,8 @@ namespace BookingSystem.Repositories
             var query = @"
         SELECT 
             COUNT(*) as Total,
-            ISNULL(SUM(CASE WHEN Status = 'Completed' THEN 1 ELSE 0 END), 0) as Completed,
-            ISNULL(SUM(CASE WHEN Status = 'Cancelled' THEN 1 ELSE 0 END), 0) as Cancelled
+            COALESCE(SUM(CASE WHEN Status = 'Completed' THEN 1 ELSE 0 END), 0) as Completed,
+            COALESCE(SUM(CASE WHEN Status = 'Cancelled' THEN 1 ELSE 0 END), 0) as Cancelled
         FROM Appointments WHERE CustomerId = @CustomerId";
 
             using var connection = _context.CreateConnection();
@@ -68,13 +68,14 @@ namespace BookingSystem.Repositories
         public async Task<IEnumerable<Appointment>> GetUpcomingAppointmentsAsync(string customerId)
         {
             var query = @"
-        SELECT TOP 3 a.*, s.*, p.*, up.FirstName, up.LastName
+        SELECT  a.*, s.*, p.*, up.FirstName, up.LastName
         FROM Appointments a
         INNER JOIN Services s ON a.ServiceId = s.ServiceId
         INNER JOIN Providers p ON a.ProviderId = p.ProviderId
         INNER JOIN UserProfiles up ON p.UserId = up.UserId
-        WHERE a.CustomerId = @CustomerId AND a.AppointmentDate >= CAST(GETDATE() AS DATE) AND a.Status = 'Confirmed'
-        ORDER BY a.AppointmentDate ASC";
+        WHERE a.CustomerId = @CustomerId AND a.AppointmentDate >= CURRENT_DATE AND a.Status = 'Confirmed'
+        ORDER BY a.AppointmentDate ASC
+        LIMIT 3";
 
             using var connection = _context.CreateConnection();
             return await connection.QueryAsync<Appointment, Service, Provider, Appointment>(

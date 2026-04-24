@@ -19,14 +19,15 @@ namespace BookingSystem.Repositories
 
         public async Task<decimal> GetTotalRevenueAsync()
         {
-            var sql = "SELECT ISNULL(SUM(TotalPrice), 0) FROM Appointments WHERE Status = 'Completed'";
+            var sql = "SELECT COALESCE(SUM(TotalPrice), 0) FROM Appointments WHERE Status = 'Completed'\r\n";
             using var connection = _context.CreateConnection();
             return await connection.ExecuteScalarAsync<decimal>(sql);
         }
 
         public async Task<IEnumerable<Appointment>> GetAllAppointmentsAsync()
         {
-            var sql = @"SELECT a.*, s.*, p.*, up.FirstName + ' ' + up.LastName as CustomerName
+            var sql = @"SELECT a.*, s.*, p.*, up.FirstName || ' ' || up.LastName as CustomerName
+
                         FROM Appointments a
                         INNER JOIN Services s ON a.ServiceId = s.ServiceId
                         INNER JOIN Providers p ON a.ProviderId = p.ProviderId
@@ -42,7 +43,7 @@ namespace BookingSystem.Repositories
 
         public async Task<bool> ToggleServiceStatusAsync(int id)
         {
-            var sql = "UPDATE Services SET IsActive = CASE WHEN IsActive = 1 THEN 0 ELSE 1 END WHERE ServiceId = @Id";
+            var sql = "UPDATE Services SET \"IsActive\" = NOT \"IsActive\" WHERE \"ServiceId\" = @Id";
             using var connection = _context.CreateConnection();
             return await connection.ExecuteAsync(sql, new { Id = id }) > 0;
         }
@@ -64,7 +65,7 @@ namespace BookingSystem.Repositories
         {
             using var connection = _context.CreateConnection();
             return await connection.ExecuteScalarAsync<decimal>(
-                "SELECT ISNULL(SUM(TotalPrice), 0) FROM Appointments WHERE Status = 'Completed' AND MONTH(AppointmentDate) = MONTH(GETDATE())");
+                "SELECT COALESCE(SUM(TotalPrice), 0) FROM Appointments WHERE Status = 'Completed' \r\nAND EXTRACT(MONTH FROM AppointmentDate) = EXTRACT(MONTH FROM NOW())");
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -84,15 +85,15 @@ namespace BookingSystem.Repositories
         public async Task<bool> VerifyProviderAsync(int id)
         {
             using var connection = _context.CreateConnection();
-            return await connection.ExecuteAsync("UPDATE Providers SET IsVerified = 1 WHERE ProviderId = @Id", new { Id = id }) > 0;
+            return await connection.ExecuteAsync("UPDATE Providers SET IsVerified = true WHERE ProviderId = @Id", new { Id = id }) > 0;
         }
 
         // Fix for Error CS0535: Implementation of AddServiceAsync
         public async Task<int> AddServiceAsync(Service service)
         {
             var sql = @"INSERT INTO Services (CategoryId, Name, Description, Price, DurationMinutes, Category, ImageUrl, IsActive, CreatedDate)
-                        VALUES (@CategoryId, @Name, @Description, @Price, @DurationMinutes, @Category, @ImageUrl, @IsActive, @CreatedDate);
-                        SELECT CAST(SCOPE_IDENTITY() as int);";
+            VALUES (@CategoryId, @Name, @Description, @Price, @DurationMinutes, @Category, @ImageUrl, @IsActive, @CreatedDate)
+            RETURNING ""ServiceId""";
 
             using var connection = _context.CreateConnection();
             return await connection.QuerySingleAsync<int>(sql, new

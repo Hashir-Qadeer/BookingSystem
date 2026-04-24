@@ -18,7 +18,7 @@ namespace BookingSystem.Repositories
             var query = @"SELECT s.*, c.CategoryName as Category 
                           FROM Services s 
                           INNER JOIN ServiceCategories c ON s.CategoryId = c.CategoryId 
-                          WHERE s.IsActive = 1";
+                          WHERE s.IsActive = true";
 
             using (var connection = _context.CreateConnection())
             {
@@ -46,7 +46,7 @@ namespace BookingSystem.Repositories
                           FROM Providers p
                           INNER JOIN UserProfiles up ON p.UserId = up.UserId
                           INNER JOIN ProviderServices ps ON p.ProviderId = ps.ProviderId
-                          WHERE ps.ServiceId = @ServiceId AND ps.IsActive = 1";
+                          WHERE ps.ServiceId = @ServiceId AND ps.IsActive = true";
 
             using (var connection = _context.CreateConnection())
             {
@@ -56,7 +56,7 @@ namespace BookingSystem.Repositories
 
         public async Task<IEnumerable<Review>> GetReviewsByServiceIdAsync(int serviceId)
         {
-            var query = @"SELECT r.*, up.FirstName + ' ' + up.LastName as CustomerName, up.ProfileImageUrl as CustomerImageUrl
+            var query = @"SELECT r.*, up.FirstName || ' ' || up.LastName as CustomerName, up.ProfileImageUrl as CustomerImageUrl
                           FROM Reviews r
                           INNER JOIN UserProfiles up ON r.CustomerId = up.UserId
                           WHERE r.ServiceId = @ServiceId
@@ -73,7 +73,7 @@ namespace BookingSystem.Repositories
             var query = @"SELECT s.*, c.CategoryName as Category 
                           FROM Services s 
                           INNER JOIN ServiceCategories c ON s.CategoryId = c.CategoryId 
-                          WHERE c.CategoryName = @CatName AND s.IsActive = 1";
+                          WHERE c.CategoryName = @CatName AND s.IsActive = true";
 
             using (var connection = _context.CreateConnection())
             {

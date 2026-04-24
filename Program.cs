@@ -12,11 +12,12 @@ namespace BookingSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+     ?? builder.Configuration.GetConnectionString("DefaultConnection")
+     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+     options.UseNpgsql(connectionString));
 
             // Identity Config - We don't necessarily need .AddRoles if using pure Claims, 
             // but it's good to keep for compatibility.
@@ -55,6 +56,8 @@ namespace BookingSystem
                 var services = scope.ServiceProvider;
                 try
                 {
+                    var db = services.GetRequiredService<ApplicationDbContext>();
+                    db.Database.EnsureCreated();
                     await SeedData.Initialize(services);
                 }
                 catch (Exception ex)
@@ -63,6 +66,9 @@ namespace BookingSystem
                     logger.LogError(ex, "Seeding Failed!");
                 }
             }
+
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            app.Urls.Add($"http://0.0.0.0:{port}");
 
             if (!app.Environment.IsDevelopment())
             {

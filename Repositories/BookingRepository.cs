@@ -16,7 +16,7 @@ namespace BookingSystem.Repositories
             int dayOfWeek = (int)date.DayOfWeek;
             var scheduleQuery = @"SELECT * FROM ProviderSchedules 
                                  WHERE ProviderId = @ProviderId AND DayOfWeek = @Day 
-                                 AND IsActive = 1";
+                                 AND IsActive = true";
 
             // 2. Get already booked appointments for that day
             var bookedQuery = @"SELECT StartTime, EndTime FROM Appointments 
@@ -55,8 +55,8 @@ namespace BookingSystem.Repositories
         public async Task<int> CreateAppointmentAsync(Appointment appt)
         {
             var sql = @"INSERT INTO Appointments (CustomerId, ProviderId, ServiceId, AppointmentDate, StartTime, EndTime, Status, CustomerNotes, TotalPrice, CreatedDate)
-                        VALUES (@CustomerId, @ProviderId, @ServiceId, @AppointmentDate, @StartTime, @EndTime, @Status, @CustomerNotes, @TotalPrice, @CreatedDate);
-                        SELECT CAST(SCOPE_IDENTITY() as int);";
+                        VALUES (@CustomerId, @ProviderId, @ServiceId, @AppointmentDate, @StartTime, @EndTime, @Status, @CustomerNotes, @TotalPrice, @CreatedDate)
+                        RETURNING ""AppointmentId""";
 
             using var connection = _context.CreateConnection();
             return await connection.QuerySingleAsync<int>(sql, appt);

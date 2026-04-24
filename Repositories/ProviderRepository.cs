@@ -44,7 +44,7 @@ namespace BookingSystem.Repositories
             // We join Appointments (a) with Services (s) and UserProfiles (up) 
             // to get the Customer's real name.
             var query = @"SELECT a.*, s.*, 
-                  up.FirstName + ' ' + up.LastName as CustomerName
+                  up.FirstName || ' ' || up.LastName as CustomerName
                   FROM Appointments a
                   INNER JOIN Services s ON a.ServiceId = s.ServiceId
                   INNER JOIN UserProfiles up ON a.CustomerId = up.UserId
@@ -68,10 +68,10 @@ namespace BookingSystem.Repositories
         {
             var query = @"
                 SELECT 
-                    COUNT(CASE WHEN AppointmentDate = CAST(GETDATE() AS DATE) THEN 1 END) as Today,
-                    COUNT(CASE WHEN AppointmentDate BETWEEN CAST(GETDATE() AS DATE) AND DATEADD(day, 7, GETDATE()) THEN 1 END) as Week,
-                    COUNT(CASE WHEN MONTH(AppointmentDate) = MONTH(GETDATE()) AND YEAR(AppointmentDate) = YEAR(GETDATE()) THEN 1 END) as Month,
-                    ISNULL(SUM(CASE WHEN MONTH(AppointmentDate) = MONTH(GETDATE()) AND Status = 'Completed' THEN TotalPrice ELSE 0 END), 0) as Revenue
+                    COUNT(CASE WHEN AppointmentDate = CURRENT_DATE THEN 1 END) as Today,
+                    COUNT(CASE WHEN AppointmentDate BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' THEN 1 END) as Week,
+                    COUNT(CASE WHEN EXTRACT(MONTH FROM AppointmentDate) = EXTRACT(MONTH FROM NOW()) AND EXTRACT(YEAR FROM AppointmentDate) = EXTRACT(YEAR FROM NOW()) THEN 1 END) as Month,
+                    COALESCE(SUM(CASE WHEN EXTRACT(MONTH FROM AppointmentDate) = EXTRACT(MONTH FROM NOW()) AND Status = 'Completed' THEN TotalPrice ELSE 0 END), 0) as Revenue
                 FROM Appointments WHERE ProviderId = @Id";
             using var connection = _context.CreateConnection();
             var res = await connection.QuerySingleAsync(query, new { Id = providerId });
