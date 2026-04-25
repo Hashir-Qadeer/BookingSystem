@@ -29,6 +29,18 @@ namespace BookingSystem.Data
         {
             base.OnModelCreating(builder);
 
+
+            builder.Entity<UserProfile>().ToTable("userprofiles");
+            builder.Entity<Models.ServiceCategory>().ToTable("servicecategories");
+            builder.Entity<Service>().ToTable("services");
+            builder.Entity<Provider>().ToTable("providers");
+            builder.Entity<ProviderService>().ToTable("providerservices");
+            builder.Entity<ProviderSchedule>().ToTable("providerschedules");
+            builder.Entity<Appointment>().ToTable("appointments");
+            builder.Entity<TimeSlot>().ToTable("timeslots");
+            builder.Entity<Payment>().ToTable("payments");
+            builder.Entity<Review>().ToTable("reviews");
+            builder.Entity<Notification>().ToTable("notifications");
             // 1. Primary Key Mappings (Fixes the InvalidOperationExceptions)
             builder.Entity<UserProfile>().HasKey(up => up.UserProfileId);
             builder.Entity<Models.ServiceCategory>().HasKey(sc => sc.CategoryId);
